@@ -18,6 +18,8 @@ A React-based web application that connects people in need with NGOs that can pr
 - **Vite** - Build tool and development server
 - **React Router** - Client-side routing
 - **Tailwind CSS** - Utility-first CSS framework
+- **MongoDB** - NoSQL database
+- **Mongoose** - MongoDB object modeling
 - **Lucide React** - Beautiful icons
 - **Date-fns** - Date manipulation library
 
@@ -26,6 +28,7 @@ A React-based web application that connects people in need with NGOs that can pr
 Before you begin, ensure you have the following installed:
 - **Node.js** (version 16 or higher)
 - **npm** (comes with Node.js)
+- **MongoDB** (local installation or MongoDB Atlas account)
 
 ## Installation & Setup
 
