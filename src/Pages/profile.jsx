@@ -1,91 +1,71 @@
-
 import React, { useState, useEffect } from "react";
-import { User } from "@/entities/User";
-import { Case } from "@/entities/Case";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Heart, User, Mail, Phone, MapPin, Calendar, AlertTriangle } from "lucide-react";
 import { createPageUrl } from "@/utils";
-import { Loader2, User as UserIcon, AlertCircle, Shield, Users } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Added useNavigate
-
-import ProfileHeader from "../components/profile/ProfileHeader";
-import CaseListItem from "../components/profile/CaseListItem";
-import AdminRequestForm from "../components/profile/AdminRequestForm";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
     const [user, setUser] = useState(null);
-    const [cases, setCases] = useState([]);
-    const [stats, setStats] = useState({ total: 0, pending: 0, in_progress: 0, resolved: 0 });
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate(); // Initialized useNavigate
+    const [userCases, setUserCases] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            setError(null);
-            try {
-                const currentUser = await User.me();
+        // Mock user data - in a real app, this would come from authentication
+        setUser({
+            name: "John Doe",
+            email: "john@example.com",
+            phone: "+91-9876543210",
+            user_type: "individual",
+            profile_photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop&crop=face"
+        });
 
-                // If user is an NGO, redirect to their dedicated profile page.
-                if (currentUser.user_type === 'ngo') {
-                    navigate(createPageUrl('NGOProfile'));
-                    return; // Stop further execution for NGOs on this page.
-                }
-
-                setUser(currentUser);
-
-                const userCases = await Case.filter({ created_by: currentUser.email });
-                setCases(userCases);
-
-                // Calculate stats
-                const newStats = userCases.reduce((acc, currentCase) => {
-                    acc.total++;
-                    if (currentCase.status === 'pending') acc.pending++;
-                    if (currentCase.status === 'in_progress') acc.in_progress++;
-                    if (currentCase.status === 'resolved') acc.resolved++;
-                    return acc;
-                }, { total: 0, pending: 0, in_progress: 0, resolved: 0 });
-                setStats(newStats);
-
-            } catch (e) {
-                setError("You need to be logged in to view your profile. Please log in to continue.");
-                console.error("Error fetching user profile:", e);
+        // Mock user cases
+        setUserCases([
+            {
+                id: "case_1",
+                title: "Elderly person needs medical assistance",
+                status: "pending",
+                priority: "high",
+                created_date: new Date().toISOString(),
+                location: { city: "Mumbai", state: "Maharashtra" }
+            },
+            {
+                id: "case_2",
+                title: "Homeless family needs shelter",
+                status: "in_progress",
+                priority: "urgent",
+                created_date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+                location: { city: "Delhi", state: "Delhi" }
             }
-            setIsLoading(false);
-        };
+        ]);
+    }, []);
 
-        fetchData();
-    }, [navigate]); // Added navigate to dependency array
-
-    const handleLogin = async () => {
-        await User.loginWithRedirect(window.location.href);
+    const statusColors = {
+        pending: "bg-yellow-100 text-yellow-800",
+        in_progress: "bg-blue-100 text-blue-800",
+        resolved: "bg-green-100 text-green-800"
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-[60vh]">
-                <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
-            </div>
-        );
-    }
+    const priorityColors = {
+        low: "bg-gray-100 text-gray-800",
+        medium: "bg-yellow-100 text-yellow-800",
+        high: "bg-orange-100 text-orange-800",
+        urgent: "bg-red-100 text-red-800"
+    };
 
-    if (error) {
+    if (!user) {
         return (
-            <div className="max-w-2xl mx-auto text-center py-20 px-4">
-                <Card className="shadow-lg">
-                    <CardHeader>
-                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="w-8 h-8 text-red-600" />
-                        </div>
-                        <CardTitle>Access Denied</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <AlertDescription className="text-lg text-gray-600 mb-6">{error}</AlertDescription>
-                        <Button onClick={handleLogin}>
-                            <UserIcon className="mr-2 h-4 w-4" /> Log In / Sign Up
+            <div className="min-h-screen flex items-center justify-center">
+                <Card className="w-full max-w-md text-center">
+                    <CardContent className="p-8">
+                        <Heart className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to HOPEE</h2>
+                        <p className="text-gray-600 mb-6">
+                            Please log in to view your profile and manage your cases.
+                        </p>
+                        <Button className="w-full">
+                            Login / Register
                         </Button>
                     </CardContent>
                 </Card>
@@ -95,60 +75,131 @@ export default function Profile() {
 
     return (
         <div className="min-h-screen p-4 md:p-8">
-            <div className="max-w-7xl mx-auto">
-                <ProfileHeader user={user} stats={stats} />
+            <div className="max-w-6xl mx-auto">
+                {/* Profile Header */}
+                <Card className="mb-8">
+                    <CardContent className="p-8">
+                        <div className="flex flex-col md:flex-row items-center gap-6">
+                            <img
+                                src={user.profile_photo}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
+                            />
+                            <div className="flex-1 text-center md:text-left">
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">{user.name}</h1>
+                                <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <Mail className="w-4 h-4" />
+                                        {user.email}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Phone className="w-4 h-4" />
+                                        {user.phone}
+                                    </div>
+                                </div>
+                                <Badge className="bg-blue-100 text-blue-800">
+                                    {user.user_type === 'ngo' ? 'NGO Partner' : 'Individual User'}
+                                </Badge>
+                            </div>
+                            <div className="flex gap-2">
+                                <Link to={createPageUrl("ReportCase")}>
+                                    <Button className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
+                                        <Heart className="w-4 h-4 mr-2" />
+                                        Report New Case
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                <main className="mt-8 grid md:grid-cols-3 gap-8">
-                    <div className="md:col-span-2">
-                        <Card className="border-none shadow-xl">
-                            <CardHeader>
-                                <CardTitle>My Reported Cases</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {cases.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {cases.map((caseItem) => (
-                                            <CaseListItem key={caseItem.id} caseItem={caseItem} />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-12">
-                                        <h3 className="text-xl font-semibold text-gray-800 mb-2">You haven't reported any cases yet.</h3>
-                                        <p className="text-gray-500 mb-6">Your reports will appear here once you submit them.</p>
-                                        <Link to={createPageUrl("ReportCase")}>
-                                            <Button>Report a Case Now</Button>
-                                        </Link>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-                    <div className="md:col-span-1 space-y-8"> {/* Added space-y-8 for vertical spacing */}
-                        {user && user.user_type === 'user' && user.role !== 'admin' && ( // New card for NGO registration
-                            <Card className="border-none shadow-xl">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2"><Users /> Become an NGO Partner</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-gray-600 mb-4">Join our network of verified organizations to make a direct impact in your community.</p>
-                                    <Link to={createPageUrl("NGORegister")}>
-                                        <Button className="w-full">Start NGO Registration</Button>
+                {/* User Cases */}
+                <div className="grid lg:grid-cols-2 gap-8">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5" />
+                                My Reported Cases
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {userCases.length > 0 ? (
+                                <div className="space-y-4">
+                                    {userCases.map((caseItem) => (
+                                        <div key={caseItem.id} className="border rounded-lg p-4">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h3 className="font-semibold text-gray-900">{caseItem.title}</h3>
+                                                <div className="flex gap-2">
+                                                    <Badge className={statusColors[caseItem.status]}>
+                                                        {caseItem.status.replace("_", " ")}
+                                                    </Badge>
+                                                    <Badge className={priorityColors[caseItem.priority]}>
+                                                        {caseItem.priority}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                                                <div className="flex items-center gap-1">
+                                                    <MapPin className="w-3 h-3" />
+                                                    {caseItem.location.city}, {caseItem.location.state}
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {new Date(caseItem.created_date).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-gray-500">
+                                    <Heart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                                    <p>No cases reported yet</p>
+                                    <Link to={createPageUrl("ReportCase")}>
+                                        <Button variant="outline" className="mt-4">
+                                            Report Your First Case
+                                        </Button>
                                     </Link>
-                                </CardContent>
-                            </Card>
-                        )}
-                        {user && user.role !== 'admin' && (
-                            <Card className="border-none shadow-xl">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2"><Shield /> Admin Access</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <AdminRequestForm user={user} />
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
-                </main>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <User className="w-5 h-5" />
+                                Quick Actions
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <Link to={createPageUrl("ReportCase")} className="block">
+                                    <Button variant="outline" className="w-full justify-start">
+                                        <Heart className="w-4 h-4 mr-2" />
+                                        Report a New Case
+                                    </Button>
+                                </Link>
+                                
+                                {user.user_type !== 'ngo' && (
+                                    <Link to={createPageUrl("NGORegister")} className="block">
+                                        <Button variant="outline" className="w-full justify-start">
+                                            <User className="w-4 h-4 mr-2" />
+                                            Become an NGO Partner
+                                        </Button>
+                                    </Link>
+                                )}
+                                
+                                <Link to={createPageUrl("Contact")} className="block">
+                                    <Button variant="outline" className="w-full justify-start">
+                                        <Mail className="w-4 h-4 mr-2" />
+                                        Contact Support
+                                    </Button>
+                                </Link>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     );

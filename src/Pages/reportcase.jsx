@@ -13,8 +13,8 @@ import { MapPin, Camera, Upload, Heart, AlertTriangle, CheckCircle } from "lucid
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-import LocationPicker from "../components/case/LocationPicker";
-import PhotoUpload from "../components/case/PhotoUpload";
+import LocationPicker from "../Components/case/locationPicker.jsx";
+import PhotoUpload from "../Components/case/photoUpload.jsx";
 
 export default function ReportCase() {
     const navigate = useNavigate();
