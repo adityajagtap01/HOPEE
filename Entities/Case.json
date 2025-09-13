@@ -1,0 +1,120 @@
+{
+    "name": "Case",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "Brief title of the case"
+        },
+        "description": {
+            "type": "string",
+            "description": "Detailed description of the situation"
+        },
+        "location": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                }
+            },
+            "description": "Location details of the case"
+        },
+        "photo_url": {
+            "type": "string",
+            "description": "URL of uploaded photo"
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "in_progress",
+                "resolved"
+            ],
+            "default": "pending",
+            "description": "Current status of the case"
+        },
+        "priority": {
+            "type": "string",
+            "enum": [
+                "low",
+                "medium",
+                "high",
+                "urgent"
+            ],
+            "default": "medium",
+            "description": "Priority level of the case"
+        },
+        "category": {
+            "type": "string",
+            "enum": [
+                "homeless",
+                "medical",
+                "elderly",
+                "abandoned",
+                "mental_health",
+                "food_security",
+                "other"
+            ],
+            "description": "Category of help needed"
+        },
+        "contact_phone": {
+            "type": "string",
+            "description": "Contact phone number"
+        },
+        "assigned_ngo": {
+            "type": "string",
+            "description": "NGO ID assigned to handle this case"
+        },
+        "resolution_notes": {
+            "type": "string",
+            "description": "Notes about case resolution"
+        }
+    },
+    "required": [
+        "title",
+        "description",
+        "location",
+        "category"
+    ],
+    "rls": {
+        "read": {
+            "$or": [
+                {
+                    "created_by": "{{user.email}}"
+                },
+                {
+                    "assigned_ngo": "{{user.ngo_id}}"
+                },
+                {
+                    "user_condition": {
+                        "role": "admin"
+                    }
+                }
+            ]
+        },
+        "write": {
+            "$or": [
+                {
+                    "assigned_ngo": "{{user.ngo_id}}"
+                },
+                {
+                    "user_condition": {
+                        "role": "admin"
+                    }
+                }
+            ]
+        }
+    }
+}
