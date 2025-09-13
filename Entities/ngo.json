@@ -1,0 +1,91 @@
+{
+    "name": "NGO",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Name of the NGO"
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Contact email"
+        },
+        "phone": {
+            "type": "string",
+            "description": "Contact phone number"
+        },
+        "description": {
+            "type": "string",
+            "description": "Description of NGO's mission and work"
+        },
+        "service_areas": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Cities/areas where NGO operates"
+        },
+        "specializations": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "homeless",
+                    "medical",
+                    "elderly",
+                    "abandoned",
+                    "mental_health",
+                    "food_security",
+                    "other"
+                ]
+            },
+            "description": "Areas of expertise"
+        },
+        "verified": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether NGO is verified by admin"
+        },
+        "website": {
+            "type": "string",
+            "description": "NGO website URL"
+        },
+        "logo_url": {
+            "type": "string",
+            "description": "NGO logo image URL"
+        }
+    },
+    "required": [
+        "name",
+        "email",
+        "description",
+        "service_areas"
+    ],
+    "rls": {
+        "read": {
+            "$or": [
+                {
+                    "_id": "{{user.ngo_id}}"
+                },
+                {
+                    "user_condition": {
+                        "role": "admin"
+                    }
+                }
+            ]
+        },
+        "write": {
+            "$or": [
+                {
+                    "_id": "{{user.ngo_id}}"
+                },
+                {
+                    "user_condition": {
+                        "role": "admin"
+                    }
+                }
+            ]
+        }
+    }
+}

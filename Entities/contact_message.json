@@ -1,0 +1,49 @@
+{
+    "name": "ContactMessage",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Name of person sending message"
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address"
+        },
+        "subject": {
+            "type": "string",
+            "description": "Message subject"
+        },
+        "message": {
+            "type": "string",
+            "description": "Message content"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "general",
+                "bug_report",
+                "feature_request",
+                "support"
+            ],
+            "default": "general",
+            "description": "Type of message"
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "new",
+                "in_review",
+                "resolved"
+            ],
+            "default": "new",
+            "description": "Status of the message"
+        }
+    },
+    "required": [
+        "name",
+        "email",
+        "message"
+    ]
+}

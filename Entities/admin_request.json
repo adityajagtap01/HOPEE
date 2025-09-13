@@ -1,0 +1,52 @@
+{
+    "name": "AdminRequest",
+    "type": "object",
+    "properties": {
+        "user_email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email of the user requesting admin access"
+        },
+        "user_name": {
+            "type": "string",
+            "description": "Name of the user"
+        },
+        "reason": {
+            "type": "string",
+            "description": "Reason for requesting admin access"
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "approved",
+                "rejected"
+            ],
+            "default": "pending"
+        }
+    },
+    "required": [
+        "user_email",
+        "user_name",
+        "reason"
+    ],
+    "rls": {
+        "read": {
+            "$or": [
+                {
+                    "user_email": "{{user.email}}"
+                },
+                {
+                    "user_condition": {
+                        "role": "admin"
+                    }
+                }
+            ]
+        },
+        "write": {
+            "user_condition": {
+                "role": "admin"
+            }
+        }
+    }
+}
